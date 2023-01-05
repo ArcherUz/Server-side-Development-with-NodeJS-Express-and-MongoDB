@@ -1,3 +1,5 @@
+//Dishes mongoose schema. 
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -16,8 +18,9 @@ var commentSchema = new Schema({
         required: true
     },
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId, //an object id to link with userSchema
+        ref: 'User' //mongoose is NOSQL which does not support JOIN. ref can link two schema
+        //stores a reference to the id of the user schema
     }
 }, {
     timestamps: true
@@ -54,7 +57,7 @@ var dishSchema = new Schema({
         type: Boolean,
         default:false      
     },
-    comments:[commentSchema]
+    comments:[commentSchema] //to use commentSchema
 }, {
     timestamps: true
 });

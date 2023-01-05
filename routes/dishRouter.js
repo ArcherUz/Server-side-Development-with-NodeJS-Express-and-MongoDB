@@ -60,6 +60,7 @@ dishRouter.route('/:dishId')
     res.end('POST operation not supported on /dishes/'+ req.params.dishId);
 })
 .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    //update dish by req.body and return the new updated dish
     Dishes.findByIdAndUpdate(req.params.dishId, {
         $set: req.body
     }, { new: true })
@@ -102,7 +103,7 @@ dishRouter.route('/:dishId/comments')
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null) {
-            req.body.author = req.user._id;
+            req.body.author = req.user._id; //add user id into request body
             dish.comments.push(req.body);
             dish.save()
             .then((dish) => {
@@ -125,6 +126,7 @@ dishRouter.route('/:dishId/comments')
         + req.params.dishId + '/comments');
 })
 .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    //remove all comments in that dish
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null) {

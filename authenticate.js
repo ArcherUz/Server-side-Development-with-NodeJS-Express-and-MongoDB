@@ -5,21 +5,30 @@ var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
-var config = require('./config.js');
+var config = require('./config.js'); //secrete key and mongodbUrl
 
 exports.local = passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+//store and retrieve user information from Session
+passport.serializeUser(User.serializeUser()); // converted to a unique identifier(ID number) stored in session
+passport.deserializeUser(User.deserializeUser()); //takes the identifier and retrieve the corresponding user object from the database
 
+/*
+encode user information by jwt using secretkey
+the signed JWT can be sent to the client for authentication of users
+*/
 exports.getToken = function(user) {
     return jwt.sign(user, config.secretKey,
         {expiresIn: 3600});
 };
 
+
 var opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+//extract jwt from the request
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken(); //extract jwt from authenticate header
 opts.secretOrKey = config.secretKey;
 
+//configure jwt authentication strategy by using passport.js library
+//find user in jwt_payload(decoded jwt)
 exports.jwtPassport = passport.use(new JwtStrategy(opts,
     (jwt_payload, done) => {
         console.log("JWT payload: ", jwt_payload);
@@ -36,6 +45,7 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
         });
     }));
 
+//use jwt previously configured to vertify users and protect routes
 exports.verifyUser = passport.authenticate('jwt', {session: false});
 
 exports.verifyAdmin = function(req, res, next) {
